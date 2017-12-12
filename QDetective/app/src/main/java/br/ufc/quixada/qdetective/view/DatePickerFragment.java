@@ -35,6 +35,8 @@ public class DatePickerFragment extends DialogFragment{
         return datePickerDialog;
     }
 
+
+
     DatePickerDialog.OnDateSetListener confirmaData = new DatePickerDialog.OnDateSetListener(){
 
         @Override

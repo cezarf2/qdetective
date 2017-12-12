@@ -52,7 +52,7 @@ public class CustomDenunciaAdapter extends BaseAdapter{
         TextView textDescricao = view.findViewById(R.id.descricao_denuncia);
         TextView textUsuario = view.findViewById(R.id.usuario_denuncia);
 
-        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 
         Denuncia denuncia = denuncias.get(i);
 

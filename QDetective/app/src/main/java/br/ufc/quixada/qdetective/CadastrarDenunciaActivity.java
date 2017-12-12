@@ -30,11 +30,15 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import org.w3c.dom.Text;
 
 import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 import br.ufc.quixada.qdetective.dao.DenunciaDAO;
 import br.ufc.quixada.qdetective.model.Denuncia;
@@ -72,10 +76,10 @@ public class CadastrarDenunciaActivity extends AppCompatActivity implements Date
 //        mViewHolder.imagem = (ImageView) findViewById(R.id.imagem);
         mViewHolder.input_descricao = (EditText) findViewById(R.id.descricao);
         mViewHolder.input_usuario = (EditText) findViewById(R.id.usuario);
-        mViewHolder.webView = (WebView) findViewById(R.id.mapa);
+        mViewHolder.latitudeText = findViewById(R.id.latitude_denuncia);
+        mViewHolder.longitudeText = findViewById(R.id.longitude_denuncia);
         mViewHolder.containerMidia = (LinearLayout) findViewById(R.id.container_midia);
 
-        setSettingsWebView(mViewHolder.webView);
         getLocationManager();
         mViewHolder.spinner_categoria.setAdapter(adapterCategoria);
 //        mViewHolder.imagem.setVisibility(View.INVISIBLE);
@@ -89,7 +93,11 @@ public class CadastrarDenunciaActivity extends AppCompatActivity implements Date
 
     @Override
     public void onDateSelectedClick(DialogFragment dialog, int ano, int mes, int dia) {
-        String data = dia + "/" + mes + "/" + ano;
+        final Calendar calendar = Calendar.getInstance();
+        int horas = calendar.get(Calendar.HOUR_OF_DAY);
+        int minutos = calendar.get(Calendar.MINUTE);
+
+        String data = dia + "/" + mes + "/" + ano + " " + horas + ":" + minutos;
         this.mViewHolder.button_data.setText(data);
     }
 
@@ -135,9 +143,9 @@ public class CadastrarDenunciaActivity extends AppCompatActivity implements Date
 
                     ImageView imageView = new ImageView(this);
                     imageView.setLayoutParams(new  LinearLayout.LayoutParams(
-                            LinearLayout.LayoutParams.MATCH_PARENT,
-                            200
+                            LinearLayout.LayoutParams.MATCH_PARENT, 800
                     ));
+                    imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
 
                     imageView.setImageBitmap(resizedBitmap);
 
@@ -223,7 +231,7 @@ public class CadastrarDenunciaActivity extends AppCompatActivity implements Date
 
 
     public void cadastrarDenuncia(View view) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
         Denuncia denuncia = new Denuncia();
 
         denuncia.setCategoria(mViewHolder.spinner_categoria.getSelectedItem().toString());
@@ -249,14 +257,14 @@ public class CadastrarDenunciaActivity extends AppCompatActivity implements Date
         finish();
     }
 
-
     private static class ViewHolder {
         private EditText input_usuario;
         private EditText input_descricao;
         private Button button_data;
         private Spinner spinner_categoria;
         private ImageView imagem;
-        private WebView webView;
+        private TextView latitudeText;
+        private TextView longitudeText;
         private LinearLayout containerMidia;
     }
 
@@ -294,11 +302,15 @@ public class CadastrarDenunciaActivity extends AppCompatActivity implements Date
         public void onLocationChanged(Location location) {
             latitude = location.getLatitude();
             longitude = location.getLongitude();
+
             String latitudeAtual = String.valueOf(latitude);
             String longitudeAtual = String.valueOf(longitude);
 
-            String url = String.format(urlBase, latitudeAtual, longitudeAtual);
-            mViewHolder.webView.loadUrl(url);
+            mViewHolder.latitudeText.setText(latitudeAtual);
+            mViewHolder.longitudeText.setText(longitudeAtual);
+
+            //String url = String.format(urlBase, latitudeAtual, longitudeAtual);
+            //mViewHolder.webView.loadUrl(url);
         }
 
         @Override
