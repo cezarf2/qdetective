@@ -66,4 +66,5 @@
         android:text="Leo Jaimesson"
         android:textColor="#000"
         android:paddingTop="10dp"/>
+
 </LinearLayout>

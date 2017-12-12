@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
@@ -8,7 +9,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:orientation="vertical">
 
         <TextView
@@ -49,7 +50,8 @@
             android:inputType="text"
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
-            android:textStyle="normal">
+            android:textStyle="normal"
+            android:maxLength="150">
 
             <requestFocus/>
         </EditText>
@@ -66,6 +68,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:prompt="@string/categoria"></Spinner>
+
+        <WebView
+            android:id="@+id/mapa"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+        </WebView>
 
         <Button
             android:id="@+id/btn_data_denuncia"
