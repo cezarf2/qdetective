@@ -75,7 +75,9 @@ public class MainActivity extends AppCompatActivity implements  AdapterView.OnIt
 
     @Override
     public void onDialogDetalhesClick(int posicao) {
-
+        Intent intent = new Intent(this, DetalhesActivity.class);
+        intent.putExtra("pos", posicao);
+        startActivity(intent);
     }
 
     @Override

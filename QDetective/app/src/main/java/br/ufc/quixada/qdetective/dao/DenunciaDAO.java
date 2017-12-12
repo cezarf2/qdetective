@@ -38,13 +38,7 @@ public class DenunciaDAO {
         Integer id = cursor.getInt(cursor.getColumnIndex(DatabaseHelper.Denuncia._ID));
         String descricao = cursor.getString(cursor.getColumnIndex(DatabaseHelper.Denuncia.DESCRICAO));
 
-        Date data = null;
-
-        try {
-            data = formato.parse(cursor.getString(cursor.getColumnIndex(DatabaseHelper.Denuncia.DATA)));
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+        Date data  = new Date(cursor.getLong(cursor.getColumnIndex(DatabaseHelper.Denuncia.DATA)));
 
         Double longitude = cursor.getDouble(cursor.getColumnIndex(DatabaseHelper.Denuncia.LONGITUDE));
         Double latitude = cursor.getDouble(cursor.getColumnIndex(DatabaseHelper.Denuncia.LATITUDE));

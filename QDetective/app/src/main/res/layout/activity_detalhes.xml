@@ -84,4 +84,19 @@
         android:textColor="#000"
         android:paddingTop="10dp"/>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:id="@+id/detalhe_container_midia">
+    </LinearLayout>
+
+    <WebView
+        android:id="@+id/mapa"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"></WebView>
+
+
+
+
 </LinearLayout>
