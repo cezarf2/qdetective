@@ -2,11 +2,16 @@ package br.ufc.quixada.qdetective;
 
 import android.Manifest;
 import android.app.DialogFragment;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.Matrix;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.opengl.Visibility;
 import android.os.Build;
@@ -18,6 +23,7 @@ import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.webkit.WebView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -37,11 +43,16 @@ public class CadastrarDenunciaActivity extends AppCompatActivity implements Date
 
     private static final int CAPTURAR_IMAGEM = 1;
     private Uri uri;
+    private Double latitude;
+    private Double longitude;
     private boolean possuiCartaoSD = false;
     private boolean dispositivoSuportaCartaoSD = false;
 
     private DenunciaDAO denunciaDAO;
     private  ViewHolder mViewHolder;
+    private LocationManager locationManager;
+    private String urlBase = "http://maps.googleapis.com/maps/api/staticmap" +
+            "?size=400x400&sensor=true&markers=color:red|%s,%s";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,7 +71,10 @@ public class CadastrarDenunciaActivity extends AppCompatActivity implements Date
         mViewHolder.imagem = (ImageView) findViewById(R.id.imagem);
         mViewHolder.input_descricao = (EditText) findViewById(R.id.descricao);
         mViewHolder.input_usuario = (EditText) findViewById(R.id.usuario);
+        mViewHolder.webView = (WebView) findViewById(R.id.mapa);
 
+        setSettingsWebView(mViewHolder.webView);
+        getLocationManager();
         mViewHolder.spinner_categoria.setAdapter(adapterCategoria);
         mViewHolder.imagem.setVisibility(View.INVISIBLE);
 
@@ -89,6 +103,16 @@ public class CadastrarDenunciaActivity extends AppCompatActivity implements Date
                     iniciarCapturaDeFotos();
                 } else {
                     Toast.makeText(this, "Sem permissão para uso de câmera", Toast.LENGTH_LONG).show();
+                }
+                return;
+            }
+            case 2:{
+                if ( grantResults[0] == PackageManager.PERMISSION_GRANTED &&
+                        grantResults[1] == PackageManager.PERMISSION_GRANTED &&
+                        grantResults[2] == PackageManager.PERMISSION_GRANTED) {
+                    getLocationManager();
+                } else {
+                    Toast.makeText(this, "Sem permissão para uso de gps ou rede", Toast.LENGTH_LONG).show();
                 }
                 return;
             }
@@ -199,8 +223,9 @@ public class CadastrarDenunciaActivity extends AppCompatActivity implements Date
         denuncia.setDescricao(mViewHolder.input_descricao.getText().toString());
         denuncia.setUriMidia(uri.getPath());
         denuncia.setUsuario(mViewHolder.input_usuario.getText().toString());
-        denuncia.setLatitude(0.0);
-        denuncia.setLongitude(0.0);
+
+        denuncia.setLatitude(latitude);
+        denuncia.setLongitude(longitude);
 
         this.denunciaDAO.inserirDenuncia(denuncia);
 
@@ -213,10 +238,68 @@ public class CadastrarDenunciaActivity extends AppCompatActivity implements Date
 
     private static class ViewHolder {
         private EditText input_usuario;
-        private  EditText input_descricao;
+        private EditText input_descricao;
         private Button button_data;
         private Spinner spinner_categoria;
-        private  ImageView imagem;
+        private ImageView imagem;
+        private WebView webView;
+    }
+
+    private void setSettingsWebView(WebView webView){
+        webView.getSettings().setJavaScriptEnabled(true);
+        webView.getSettings().setSupportZoom(true);
+        webView.getSettings().setBuiltInZoomControls(true);
+        webView.setBackgroundColor(Color.parseColor("#FFFFFF"));
+        webView.getSettings().setUseWideViewPort(true);
+        webView.getSettings().setLoadWithOverviewMode(false);
+    }
+
+    private void getLocationManager(){
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{
+                            Manifest.permission.ACCESS_FINE_LOCATION,
+                            Manifest.permission.ACCESS_COARSE_LOCATION,
+                            Manifest.permission.INTERNET},
+                    2);
+            return;
+        }
+
+        Listener listener = new Listener();
+        locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        long tempoAtualizacao = 0;
+        float distancia = 0;
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, tempoAtualizacao, distancia, listener);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, tempoAtualizacao, distancia, listener);
+    }
+
+    private class Listener implements LocationListener{
+
+        @Override
+        public void onLocationChanged(Location location) {
+            latitude = location.getLatitude();
+            longitude = location.getLongitude();
+            String latitudeAtual = String.valueOf(latitude);
+            String longitudeAtual = String.valueOf(longitude);
+
+            String url = String.format(urlBase, latitudeAtual, longitudeAtual);
+            mViewHolder.webView.loadUrl(url);
+        }
+
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+
+        }
+
+        @Override
+        public void onProviderEnabled(String provider) {
+
+        }
+
+        @Override
+        public void onProviderDisabled(String provider) {
+
+        }
     }
 
 }
