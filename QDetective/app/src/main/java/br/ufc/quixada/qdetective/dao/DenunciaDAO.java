@@ -4,6 +4,8 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
+import android.widget.Toast;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -106,7 +108,7 @@ public class DenunciaDAO {
         return denuncias;
     }
 
-    List<Denuncia> Denuncias() {
+    public List<Denuncia> denuncias() {
         db = helper.getReadableDatabase();
         cursor = db.query(DatabaseHelper.Denuncia.TABELA, DatabaseHelper.Denuncia.COLUNAS, null, null, null, null, null);
 
@@ -118,8 +120,8 @@ public class DenunciaDAO {
             Integer id = cursor.getInt(cursor.getColumnIndex(DatabaseHelper.Denuncia._ID));
             String descricao = cursor.getString(cursor.getColumnIndex(DatabaseHelper.Denuncia.DESCRICAO));
 
-            Date data = null;
 
+            Date data = null;
             try {
                 data = formato.parse(cursor.getString(cursor.getColumnIndex(DatabaseHelper.Denuncia.DATA)));
             } catch (ParseException e) {

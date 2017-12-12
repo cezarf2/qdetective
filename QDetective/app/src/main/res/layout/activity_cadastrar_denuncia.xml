@@ -81,11 +81,12 @@
 
             <TableRow>
                 <Button
-                    android:onClick="capturarImagem"
-                    android:text="Tirar Foto"/>
+                    android:text="Tirar Foto"
+                    android:id="@+id/tirar_foto"
+                    android:onClick="capturarImagem"/>
                 <Button
-                    android:onClick="capturarVideo"
-                    android:text="Gravar Vídeo"/>
+                    android:text="Gravar Vídeo"
+                    android:id="@+id/gravar_video"/>
             </TableRow>
         </TableLayout>
 
@@ -93,14 +94,13 @@
             android:layout_width="match_parent"
             android:layout_height="200dp"
             android:scaleType="fitCenter"
-            android:id="@+id/imagem"
-            android:src="@drawable/img1"/>
+            android:id="@+id/imagem"/>
 
         <Button
             android:id="@+id/btn_salvar_denuncia"
-            android:onClick="cadastrarDenuncia"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Salvar"/>
+            android:text="Salvar"
+            android:onClick="cadastrarDenuncia"/>
     </LinearLayout>
 </ScrollView>
