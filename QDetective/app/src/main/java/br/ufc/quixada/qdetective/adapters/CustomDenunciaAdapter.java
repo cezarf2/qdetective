@@ -57,9 +57,7 @@ public class CustomDenunciaAdapter extends BaseAdapter{
         Denuncia denuncia = denuncias.get(i);
 
         textCategoria.setText(denuncia.getCategoria());
-        String teste = (denuncia.getData() != null) ? "sim" : "não";
-        textData.setText(teste);
-//        textData.setText("sas");
+        textData.setText(dateFormat.format(denuncia.getData()));
         textDescricao.setText(denuncia.getDescricao());
 
         textUsuario.setText(denuncia.getUsuario());
