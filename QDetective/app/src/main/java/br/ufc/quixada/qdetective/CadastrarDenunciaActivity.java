@@ -28,6 +28,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -68,15 +69,16 @@ public class CadastrarDenunciaActivity extends AppCompatActivity implements Date
 
         mViewHolder.button_data = (Button) findViewById(R.id.btn_data_denuncia);
         mViewHolder.spinner_categoria = (Spinner) findViewById(R.id.categoria);
-        mViewHolder.imagem = (ImageView) findViewById(R.id.imagem);
+//        mViewHolder.imagem = (ImageView) findViewById(R.id.imagem);
         mViewHolder.input_descricao = (EditText) findViewById(R.id.descricao);
         mViewHolder.input_usuario = (EditText) findViewById(R.id.usuario);
         mViewHolder.webView = (WebView) findViewById(R.id.mapa);
+        mViewHolder.containerMidia = (LinearLayout) findViewById(R.id.container_midia);
 
         setSettingsWebView(mViewHolder.webView);
         getLocationManager();
         mViewHolder.spinner_categoria.setAdapter(adapterCategoria);
-        mViewHolder.imagem.setVisibility(View.INVISIBLE);
+//        mViewHolder.imagem.setVisibility(View.INVISIBLE);
 
         possuiCartaoSD = Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED);
         dispositivoSuportaCartaoSD = Environment.isExternalStorageRemovable();
@@ -130,8 +132,20 @@ public class CadastrarDenunciaActivity extends AppCompatActivity implements Date
                     Matrix matrix = new Matrix();
                     matrix.postRotate(90);
                     Bitmap resizedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bmpWidth, bmpHeight, matrix, true);
-                    mViewHolder.imagem.setImageBitmap(resizedBitmap);
-                    mViewHolder.imagem.setVisibility(View.VISIBLE);
+
+                    ImageView imageView = new ImageView(this);
+                    imageView.setLayoutParams(new  LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.MATCH_PARENT,
+                            200
+                    ));
+
+                    imageView.setImageBitmap(resizedBitmap);
+
+                    mViewHolder.containerMidia.removeAllViews();
+                    mViewHolder.containerMidia.addView(imageView);
+
+//                    mViewHolder.imagem.setImageBitmap(resizedBitmap);
+//                    mViewHolder.imagem.setVisibility(View.VISIBLE);
 
                 } catch (Exception e) {
                     Toast.makeText(this, "Imagem não encontrada!", Toast.LENGTH_LONG).show();
@@ -243,6 +257,7 @@ public class CadastrarDenunciaActivity extends AppCompatActivity implements Date
         private Spinner spinner_categoria;
         private ImageView imagem;
         private WebView webView;
+        private LinearLayout containerMidia;
     }
 
     private void setSettingsWebView(WebView webView){
