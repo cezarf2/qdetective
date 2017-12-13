@@ -78,7 +78,7 @@ public class WebServiceUtils {
 
     public List<Denuncia> getDenunciasJson(String url, String path) {
 
-        String uri = url + path + "/";
+        String uri = url + "/" + path;
         String json = getJSONFromAPI(uri);
         if (!json.isEmpty()) {
             try {

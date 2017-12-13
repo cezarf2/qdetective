@@ -57,18 +57,23 @@ public class CustomDenunciaAdapter extends BaseAdapter{
 
         Denuncia denuncia = denuncias.get(i);
 
-
-        switch (denuncia.getCategoria().toString()) {
-            case "VIAS_PUBLICAS":
-                textCategoria.setText("Vias públicas de acesso");
-                break;
-            case "EQUIPAMENTOS_COMUNICATARIOS":
-                textCategoria.setText("Equipamentos comunitários");
-                break;
-            case "LIMPEZA_URBANA":
-                textCategoria.setText("Limpeza urbana e saneamento");
-                break;
+        if(denuncia.getCategoria() != null){
+            switch (denuncia.getCategoria().toString()) {
+                case "VIAS_PUBLICAS":
+                    textCategoria.setText("Vias públicas de acesso");
+                    break;
+                case "EQUIPAMENTOS_COMUNICATARIOS":
+                    textCategoria.setText("Equipamentos comunitários");
+                    break;
+                case "LIMPEZA_URBANA":
+                    textCategoria.setText("Limpeza urbana e saneamento");
+                    break;
+            }
         }
+        else{
+            textCategoria.setText("Não existe categoria");
+        }
+
 //        textCategoria.setText(denuncia.getCategoria());
         textData.setText(dateFormat.format(denuncia.getData()));
         textDescricao.setText(denuncia.getDescricao());

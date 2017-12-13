@@ -368,60 +368,65 @@ public class CadastrarDenunciaActivity extends AppCompatActivity implements Date
 
 
     public void cadastrarDenuncia(View view) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-
-        Denuncia denuncia = new Denuncia();
-
-        if(getIntent().getBooleanExtra("flag", false)) {
-            denuncia = denunciaDAO.buscarDenunciaPorId(getIntent().getIntExtra("id", -1));
-        }
-
-
-        switch ((int) mViewHolder.spinner_categoria.getSelectedItemId()) {
-            case 0:
-                denuncia.setCategoria(Categoria.VIAS_PUBLICAS);
-                break;
-            case 1:
-                denuncia.setCategoria(Categoria.EQUIPAMENTOS_COMUNICATARIOS);
-                break;
-            case 2:
-                denuncia.setCategoria(Categoria.LIMPEZA_URBANA);
-                break;
-        }
 
         try {
-            denuncia.setData(dateFormat.parse(mViewHolder.button_data.getText().toString()));
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 
-        denuncia.setDescricao(mViewHolder.input_descricao.getText().toString());
-        denuncia.setUriMidia(uri.getPath());
-        denuncia.setUsuario(mViewHolder.input_usuario.getText().toString());
+            Denuncia denuncia = new Denuncia();
 
-        if(getIntent().getBooleanExtra("flag", false) == false) {
-            denuncia.setLatitude(latitude);
-            denuncia.setLongitude(longitude);
-        }
-
-        if(getIntent().getBooleanExtra("flag", false) ) {
-            this.denunciaDAO.atualizarDenuncia(denuncia);
-        }else{
-            this.denunciaDAO.inserirDenuncia(denuncia);
-        }
+            if (getIntent().getBooleanExtra("flag", false)) {
+                denuncia = denunciaDAO.buscarDenunciaPorId(getIntent().getIntExtra("id", -1));
+            }
 
 
-        if(getIntent().getBooleanExtra("flag", false)) {
-            Toast toast = Toast.makeText(this, "Denuncia atualizada com sucesso!", Toast.LENGTH_SHORT);
+            switch ((int) mViewHolder.spinner_categoria.getSelectedItemId()) {
+                case 0:
+                    denuncia.setCategoria(Categoria.VIAS_PUBLICAS);
+                    break;
+                case 1:
+                    denuncia.setCategoria(Categoria.EQUIPAMENTOS_COMUNICATARIOS);
+                    break;
+                case 2:
+                    denuncia.setCategoria(Categoria.LIMPEZA_URBANA);
+                    break;
+            }
+
+            try {
+                denuncia.setData(dateFormat.parse(mViewHolder.button_data.getText().toString()));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            denuncia.setDescricao(mViewHolder.input_descricao.getText().toString());
+            denuncia.setUriMidia(uri.getPath());
+            denuncia.setUsuario(mViewHolder.input_usuario.getText().toString());
+
+            if (getIntent().getBooleanExtra("flag", false) == false) {
+                denuncia.setLatitude(latitude);
+                denuncia.setLongitude(longitude);
+            }
+
+            if (getIntent().getBooleanExtra("flag", false)) {
+                this.denunciaDAO.atualizarDenuncia(denuncia);
+            } else {
+                this.denunciaDAO.inserirDenuncia(denuncia);
+            }
+            
+            if (getIntent().getBooleanExtra("flag", false)) {
+                Toast toast = Toast.makeText(this, "Denuncia atualizada com sucesso!", Toast.LENGTH_SHORT);
+                toast.show();
+            } else {
+                Toast toast = Toast.makeText(this, "Denuncia cadastrada com sucesso!", Toast.LENGTH_SHORT);
+                toast.show();
+            }
+
+            uri = null;
+
+            finish();
+        } catch (Exception e) {
+            Toast toast = Toast.makeText(this, "Por favor preencha todos os campos corretamente!", Toast.LENGTH_SHORT);
             toast.show();
-        }else {
-            Toast toast = Toast.makeText(this, "Denuncia cadastrada com sucesso!", Toast.LENGTH_SHORT);
-            toast.show();
         }
-
-        uri = null;
-
-        finish();
     }
 
     private static class ViewHolder {

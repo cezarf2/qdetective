@@ -15,12 +15,10 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import java.io.File;
 import java.util.List;
-import java.util.Map;
 
 import br.ufc.quixada.qdetective.adapters.CustomDenunciaAdapter;
 import br.ufc.quixada.qdetective.fragments.DetalhesDialogFragment;
@@ -31,14 +29,12 @@ public class DenunciasCompartilhadasActivity extends AppCompatActivity implement
 
     private ViewHolder viewHolder;
     private CustomDenunciaAdapter customDenunciaAdapter;
-    private WebServiceUtils webServiceUtils;
     private ProgressDialog load;
-    private List<Map<String, Object>> mapList;
 
     private boolean possuiCartaoSD = false;
     private boolean dispositivoSuportaCartaoSD = false;
 
-    private final String url = "http://35.193.98.124/QDetective/rest/";
+    private final String url = "http://35.193.98.124/QDetective/rest";
     private boolean permisaoInternet = false;
 
     @Override
@@ -46,19 +42,10 @@ public class DenunciasCompartilhadasActivity extends AppCompatActivity implement
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_denuncias_compartilhadas);
 
-        webServiceUtils = new WebServiceUtils();
-
         viewHolder = new ViewHolder();
         viewHolder.listViewDenunciasCompartilhadas = (ListView) findViewById(R.id.list_view_denuncias_compartilhadas);
 
-        customDenunciaAdapter = new CustomDenunciaAdapter(webServiceUtils.getDenunciasJson(url, "denuncias"), this);
-        List<Denuncia> denuncias = webServiceUtils.getDenunciasJson(url, "denuncias");
-        System.out.println(webServiceUtils.getRespostaServidor());
-        System.out.println(denuncias.size());
-        System.out.println(denuncias.get(0).toString());
-        //viewHolder.listViewDenunciasCompartilhadas.setAdapter(customDenunciaAdapter);
-
-        //viewHolder.listViewDenunciasCompartilhadas.setOnClickListener(this);
+        iniciarDownload();
 
         possuiCartaoSD = Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED);
         dispositivoSuportaCartaoSD = Environment.isExternalStorageRemovable();
@@ -82,10 +69,6 @@ public class DenunciasCompartilhadasActivity extends AppCompatActivity implement
 
     private static class ViewHolder{
         private ListView listViewDenunciasCompartilhadas;
-    }
-
-    public void carregarDados(){
-        mapList = webServiceUtils.get
     }
 
     @Override
@@ -151,25 +134,36 @@ public class DenunciasCompartilhadasActivity extends AppCompatActivity implement
         return pathDaMidia;
     }
 
-    private class DownloadDenuncias extends AsyncTask<Long, Void, WebServiceUtils>{
+    public void iniciarDownload(){
+        getPermissaoInternet();
+        if(permisaoInternet == true){
+            DownloadDenuncias downloadDenuncias = new DownloadDenuncias();
+            downloadDenuncias.execute();
+
+        }
+    }
+
+    private class DownloadDenuncias extends AsyncTask<Void, Void, List<Denuncia>> {
+
 
         @Override
         protected void onPreExecute(){
-            load = ProgressDialog.show(DenunciasCompartilhadasActivity.class, "Por favor aguarde",
+            load = ProgressDialog.show(DenunciasCompartilhadasActivity.this, "Por favor aguarde",
                     "Recuperando informações do servidor");
         }
 
         @Override
-        protected WebServiceUtils doInBackground(Long... ids) {
+        protected List<Denuncia> doInBackground(Void... voids) {
             WebServiceUtils webService = new WebServiceUtils();
-            String id = (ids != null && ids.length == 1) ? ids[0].toString() : "";
-            List<Denuncia> denuncias = webService.getListaDenunciasJson(url, "denuncias", id);
-            for (Denuncia denuncia : denuncias) {
-                String path = getDiretorioDeSalvamento(denuncia.getUriMidia()).getPath();
-                webService.downloadImagemBase64(url + "arquivos", path, denuncia.getId());
-                denuncia.setUriMidia(path);
-            }
-            return webService;
+            List<Denuncia> denuncias = webService.getDenunciasJson(url, "denuncias");
+            return denuncias;
+        }
+
+        @Override
+        protected void onPostExecute(List<Denuncia> denuncias) {
+            customDenunciaAdapter = new CustomDenunciaAdapter(denuncias, DenunciasCompartilhadasActivity.this);
+            viewHolder.listViewDenunciasCompartilhadas.setAdapter(customDenunciaAdapter);
+            load.dismiss();
         }
     }
 }
