@@ -96,4 +96,18 @@ public class Denuncia {
     public void setCategoria(Categoria categoria) {
         this.categoria = categoria;
     }
+
+    @Override
+    public String toString() {
+        return "Denuncia{" +
+                "id=" + id +
+                ", descricao='" + descricao + '\'' +
+                ", data=" + data +
+                ", longitude=" + longitude +
+                ", latitude=" + latitude +
+                ", uriMidia='" + uriMidia + '\'' +
+                ", usuario='" + usuario + '\'' +
+                ", categoria='" + categoria + '\'' +
+                '}';
+    }
 }

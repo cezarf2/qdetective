@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <item name="list_view_denuncia" type="id">list_view_denuncia</item>
+    <item name="list_view_denuncias_compartilhadas" type="id" />
 </resources>

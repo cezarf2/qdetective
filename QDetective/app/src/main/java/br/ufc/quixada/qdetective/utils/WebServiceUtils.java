@@ -66,6 +66,26 @@ public class WebServiceUtils {
                 Gson gson = b.create();
                 Denuncia[] denuncia = gson.fromJson(json, Denuncia[].class);
                 denuncias = new ArrayList<>(Arrays.asList(denuncia));
+                System.out.println(denuncias.size());
+                respostaServidor = "Download realizado com sucesso.";
+            } catch (Exception e) {
+                e.printStackTrace();
+                respostaServidor = "Erro ao processar JSON do servidor.";
+            }
+        }
+        return denuncias;
+    }
+
+    public List<Denuncia> getDenunciasJson(String url, String path) {
+
+        String uri = url + path + "/";
+        String json = getJSONFromAPI(uri);
+        if (!json.isEmpty()) {
+            try {
+                GsonBuilder b = new GsonBuilder().registerTypeAdapter(Date.class, new DateTypeAdapter());
+                Gson gson = b.create();
+                Denuncia[] denuncia = gson.fromJson(json, Denuncia[].class);
+                denuncias = new ArrayList<>(Arrays.asList(denuncia));
                 respostaServidor = "Download realizado com sucesso.";
             } catch (Exception e) {
                 e.printStackTrace();

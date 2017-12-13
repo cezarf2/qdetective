@@ -10,27 +10,15 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Menu Principal"
+        android:text="Denúncias Compartilhadas"
         android:textAlignment="center"
         android:textColor="#fff"
         android:textSize="22dp"
         android:background="@android:color/holo_blue_bright"
         android:padding="10dp"/>
 
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="novaDenuncia"
-        android:text="Cadastrar Denúncia" />
-
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="listarDenunciasCompartilhadas"
-        android:text="Listar Denúncias Compartilhadas" />
-
     <ListView
-        android:id="@id/list_view_denuncia"
+        android:id="@id/list_view_denuncias_compartilhadas"
         android:layout_width="match_parent"
         android:layout_height="match_parent"></ListView>
 

@@ -50,8 +50,6 @@ public class MainActivity extends AppCompatActivity implements  AdapterView.OnIt
         mViewHolder.listViewDenuncias.refreshDrawableState();
     }
 
-
-
     public void novaDenuncia(View view) {
         Intent intent = new Intent(this, CadastrarDenunciaActivity.class);
         startActivity(intent);
@@ -109,6 +107,10 @@ public class MainActivity extends AppCompatActivity implements  AdapterView.OnIt
         Toast.makeText(this, "Operação cancelada!", Toast.LENGTH_LONG).show();
     }
 
+    public void listarDenunciasCompartilhadas(View view) {
+        Intent intent = new Intent(this, DenunciasCompartilhadasActivity.class);
+        startActivity(intent);
+    }
 
     private static class ViewHolder {
        private ListView listViewDenuncias;
