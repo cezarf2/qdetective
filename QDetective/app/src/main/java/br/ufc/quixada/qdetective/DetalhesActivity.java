@@ -73,7 +73,7 @@ public class DetalhesActivity extends AppCompatActivity {
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
 
-        mViewHolder.textDetalheDenuncia.setText(denuncia.getCategoria());
+        mViewHolder.textDetalheDenuncia.setText(denuncia.getCategoria().toString());
         mViewHolder.textDetalheDataDenuncia.setText(dateFormat.format(denuncia.getData()));
         mViewHolder.textDetalheDescricaoDenuncia.setText(denuncia.getDescricao());
         mViewHolder.textDetalheUsuarioDenuncia.setText(denuncia.getUsuario());
@@ -84,7 +84,6 @@ public class DetalhesActivity extends AppCompatActivity {
 
         Uri uri = null;
 
-        Bitmap bitmap = null;
 
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             String authority = this.getApplicationContext().getPackageName() + ".fileprovider";
@@ -92,8 +91,6 @@ public class DetalhesActivity extends AppCompatActivity {
         } else {
             uri = Uri.fromFile(pathDaMidia);
         }
-
-        System.out.println("*********************************************" + id + "*********************************************");
 
         if(path[path.length-1].contains(".jpg")) {
 

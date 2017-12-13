@@ -12,6 +12,7 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 
 import br.ufc.quixada.qdetective.R;
+import br.ufc.quixada.qdetective.model.Categoria;
 import br.ufc.quixada.qdetective.model.Denuncia;
 
 /**
@@ -56,7 +57,19 @@ public class CustomDenunciaAdapter extends BaseAdapter{
 
         Denuncia denuncia = denuncias.get(i);
 
-        textCategoria.setText(denuncia.getCategoria());
+
+        switch (denuncia.getCategoria().toString()) {
+            case "VIAS_PUBLICAS":
+                textCategoria.setText("Vias públicas de acesso");
+                break;
+            case "EQUIPAMENTOS_COMUNICATARIOS":
+                textCategoria.setText("Equipamentos comunitários");
+                break;
+            case "LIMPEZA_URBANA":
+                textCategoria.setText("Limpeza urbana e saneamento");
+                break;
+        }
+//        textCategoria.setText(denuncia.getCategoria());
         textData.setText(dateFormat.format(denuncia.getData()));
         textDescricao.setText(denuncia.getDescricao());
 

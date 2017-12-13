@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import br.ufc.quixada.qdetective.model.Categoria;
 import br.ufc.quixada.qdetective.model.Denuncia;
 import br.ufc.quixada.qdetective.utils.DatabaseHelper;
 
@@ -55,7 +56,22 @@ public class DenunciaDAO {
         denuncia.setLatitude(latitude);
         denuncia.setUriMidia(uriMidia);
         denuncia.setUsuario(usuario);
-        denuncia.setCategoria(categoria);
+
+        switch (categoria) {
+            case "VIAS_PUBLICAS":
+                denuncia.setCategoria(Categoria.VIAS_PUBLICAS);
+                break;
+            case "EQUIPAMENTOS_COMUNICATARIOS":
+                denuncia.setCategoria(Categoria.EQUIPAMENTOS_COMUNICATARIOS);
+                break;
+            case "LIMPEZA_URBANA":
+                denuncia.setCategoria(Categoria.LIMPEZA_URBANA);
+                break;
+        }
+
+//        System.out.println(categoria);
+
+//        denuncia.setCategoria(Categoria.LIMPEZA_URBANA);
 
         return denuncia;
     }
@@ -89,6 +105,18 @@ public class DenunciaDAO {
             denuncia.put(DatabaseHelper.Denuncia.LATITUDE, latitude);
             denuncia.put(DatabaseHelper.Denuncia.URIMIDIA, uriMidia);
             denuncia.put(DatabaseHelper.Denuncia.USUARIO, usuario);
+
+            switch (categoria) {
+                case "VIAS_PUBLICAS":
+                    denuncia.put(DatabaseHelper.Denuncia.CATEGORIA, Categoria.VIAS_PUBLICAS);
+                    break;
+                case "EQUIPAMENTOS_COMUNICATARIOS":
+                    denuncia.put(DatabaseHelper.Denuncia.CATEGORIA, Categoria.EQUIPAMENTOS_COMUNICATARIOS);
+                    break;
+                case "LIMPEZA_URBANA":
+                    denuncia.put(DatabaseHelper.Denuncia.CATEGORIA, Categoria.LIMPEZA_URBANA);
+                    break;
+            }
             denuncia.put(DatabaseHelper.Denuncia.CATEGORIA, categoria);
             denuncias.add(denuncia);
         }
@@ -114,6 +142,8 @@ public class DenunciaDAO {
             Double latitude = cursor.getDouble(cursor.getColumnIndex(DatabaseHelper.Denuncia.LATITUDE));
             String uriMidia = cursor.getString(cursor.getColumnIndex(DatabaseHelper.Denuncia.URIMIDIA));
             String usuario = cursor.getString(cursor.getColumnIndex(DatabaseHelper.Denuncia.USUARIO));
+//            Categoria categoria = Categoria.EQUIPAMENTOS_COMUNICATARIOS;
+
             String categoria = cursor.getString(cursor.getColumnIndex(DatabaseHelper.Denuncia.CATEGORIA));
 
 //            Map<String, Object> denuncia = new HashMap<>();
@@ -128,7 +158,20 @@ public class DenunciaDAO {
             denuncia.setLatitude(latitude);
             denuncia.setUriMidia(uriMidia);
             denuncia.setUsuario(usuario);
-            denuncia.setCategoria(categoria);
+
+            switch (categoria) {
+                case "VIAS_PUBLICAS":
+                    denuncia.setCategoria(Categoria.VIAS_PUBLICAS);
+                    break;
+                case "EQUIPAMENTOS_COMUNICATARIOS":
+                    denuncia.setCategoria(Categoria.EQUIPAMENTOS_COMUNICATARIOS);
+                    break;
+                case "LIMPEZA_URBANA":
+                    denuncia.setCategoria(Categoria.LIMPEZA_URBANA);
+                    break;
+            }
+
+//            denuncia.setCategoria(categoria);
             denuncias.add(denuncia);
         }
         cursor.close();
@@ -144,7 +187,7 @@ public class DenunciaDAO {
         values.put(DatabaseHelper.Denuncia.LATITUDE, denuncia.getLatitude());
         values.put(DatabaseHelper.Denuncia.URIMIDIA, denuncia.getUriMidia());
         values.put(DatabaseHelper.Denuncia.USUARIO, denuncia.getUsuario());
-        values.put(DatabaseHelper.Denuncia.CATEGORIA, denuncia.getCategoria());
+        values.put(DatabaseHelper.Denuncia.CATEGORIA, denuncia.getCategoria().toString());
 
         db = helper.getWritableDatabase();
         long qtdInseridos = db.insert(DatabaseHelper.Denuncia.TABELA, null, values);
@@ -177,7 +220,7 @@ public class DenunciaDAO {
         values.put(DatabaseHelper.Denuncia.LATITUDE, denuncia.getLatitude());
         values.put(DatabaseHelper.Denuncia.URIMIDIA, denuncia.getUriMidia());
         values.put(DatabaseHelper.Denuncia.USUARIO, denuncia.getUsuario());
-        values.put(DatabaseHelper.Denuncia.CATEGORIA, denuncia.getCategoria());
+        values.put(DatabaseHelper.Denuncia.CATEGORIA, denuncia.getCategoria().toString());
 
         db = helper.getWritableDatabase();
         long qtdAtualizados = db.update(DatabaseHelper.Denuncia.TABELA,

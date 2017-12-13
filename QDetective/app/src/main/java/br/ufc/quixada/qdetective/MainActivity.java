@@ -70,7 +70,10 @@ public class MainActivity extends AppCompatActivity implements  AdapterView.OnIt
 
     @Override
     public void onDialogEditarClik(int id) {
-
+        Intent intent = new Intent(this, CadastrarDenunciaActivity.class);
+        intent.putExtra("id", id);
+        intent.putExtra("flag", true);
+        startActivity(intent);
     }
 
     @Override

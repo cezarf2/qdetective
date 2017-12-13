@@ -31,6 +31,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.MediaController;
 import android.widget.Spinner;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
@@ -38,11 +40,13 @@ import android.widget.VideoView;
 import org.w3c.dom.Text;
 
 import java.io.File;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 import br.ufc.quixada.qdetective.dao.DenunciaDAO;
+import br.ufc.quixada.qdetective.model.Categoria;
 import br.ufc.quixada.qdetective.model.Denuncia;
 import br.ufc.quixada.qdetective.view.DatePickerFragment;
 
@@ -88,6 +92,73 @@ public class CadastrarDenunciaActivity extends AppCompatActivity implements Date
 
         possuiCartaoSD = Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED);
         dispositivoSuportaCartaoSD = Environment.isExternalStorageRemovable();
+
+
+//        caso seja pra editar
+        if(getIntent().getBooleanExtra("flag", false)) {
+            int id = getIntent().getIntExtra("id", -1);
+
+            DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+
+            Denuncia denuncia = denunciaDAO.buscarDenunciaPorId(id);
+
+            mViewHolder.button_data.setText(dateFormat.format(denuncia.getData()));
+
+            // marcando spiner
+            if(denuncia.getCategoria().toString().equals(Categoria.VIAS_PUBLICAS.toString())) {
+                mViewHolder.spinner_categoria.setSelection(0,true);
+            }
+            if(denuncia.getCategoria().toString().equals(Categoria.EQUIPAMENTOS_COMUNICATARIOS.toString())) {
+                mViewHolder.spinner_categoria.setSelection(1, true);
+            }
+            if(denuncia.getCategoria().toString().equals(Categoria.LIMPEZA_URBANA.toString())) {
+                mViewHolder.spinner_categoria.setSelection(2, true);
+            }
+
+            mViewHolder.input_usuario.setText(denuncia.getUsuario());
+            mViewHolder.input_descricao.setText(denuncia.getDescricao());
+
+            ((TableLayout)findViewById(R.id.hack)).setVisibility(View.GONE);
+
+
+            String[] path = denuncia.getUriMidia().split("/");
+
+            File pathDaMidia = getDiretorioDeSalvamento(path[path.length-1]);
+
+            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                String authority = this.getApplicationContext().getPackageName() + ".fileprovider";
+                uri = FileProvider.getUriForFile(this, authority, pathDaMidia);
+            } else {
+                uri = Uri.fromFile(pathDaMidia);
+            }
+
+            if(path[path.length-1].contains(".jpg")) {
+
+                ImageView imageView = new ImageView(this);
+
+                imageView.setLayoutParams(new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT, 800
+                ));
+
+                imageView.setImageURI(uri);
+
+                mViewHolder.containerMidia.removeAllViews();
+                mViewHolder.containerMidia.addView(imageView);
+
+
+            }else {
+                VideoView videoView = new VideoView(this);
+                videoView.setLayoutParams(new  LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT, 800
+                ));
+                videoView.setVideoPath(denuncia.getUriMidia());
+                MediaController mc = new MediaController(this);
+                videoView.setMediaController(mc);
+
+                mViewHolder.containerMidia.removeAllViews();
+                mViewHolder.containerMidia.addView(videoView);
+            }
+        }
 
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
@@ -227,23 +298,6 @@ public class CadastrarDenunciaActivity extends AppCompatActivity implements Date
         }
     }
 
-//    private void getPermissoesVideo() {
-//        String CAMERA = Manifest.permission.CAMERA;
-//        String WRITE_EXTERNAL_STORAGE = Manifest.permission.WRITE_EXTERNAL_STORAGE;
-//        String READ_EXTERNAL_STORAGE = Manifest.permission.READ_EXTERNAL_STORAGE;
-//        int PERMISSION_GRANTED = PackageManager.PERMISSION_GRANTED;
-//
-//        boolean permissaoCamera = ActivityCompat.checkSelfPermission(this, CAMERA) == PERMISSION_GRANTED;
-//        boolean permissaoEscrita = ActivityCompat.checkSelfPermission(this, WRITE_EXTERNAL_STORAGE) == PERMISSION_GRANTED;
-//        boolean permissaoLeitura = ActivityCompat.checkSelfPermission(this, READ_EXTERNAL_STORAGE) == PERMISSION_GRANTED;
-//
-//        if (permissaoCamera && permissaoEscrita && permissaoLeitura) {
-//            iniciarGravacaoDeVideo();
-//        } else {
-//            ActivityCompat.requestPermissions(this, new String[]{CAMERA, WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE}, 1);
-//        }
-//    }
-
 
     private File getDiretorioDeSalvamento(String nomeArquivo) {
         File diretorio = this.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
@@ -259,23 +313,6 @@ public class CadastrarDenunciaActivity extends AppCompatActivity implements Date
     public void capturarVideo(View v) {
         getPermissoes(false);
     }
-
-//    private void setArquivoVideo() {
-//        File diretorio = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-//
-//        if (!possuiCartaoSD) {
-//            diretorio = this.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-//        }
-//
-//        File pathVideo = new File(diretorio + "/" + System.currentTimeMillis() + ".mp4");
-//
-//        if (android.os.Build.VERSION.SDK_INT >= 23) {
-//            String authority = this.getApplicationContext().getPackageName() + ".fileprovider";
-//            uri = FileProvider.getUriForFile(this, authority, pathVideo);
-//        } else {
-//            uri = Uri.fromFile(pathVideo);
-//        }
-//    }
 
     private void iniciarGravacaoDeVideo() {
         try {
@@ -332,9 +369,25 @@ public class CadastrarDenunciaActivity extends AppCompatActivity implements Date
 
     public void cadastrarDenuncia(View view) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+
         Denuncia denuncia = new Denuncia();
 
-        denuncia.setCategoria(mViewHolder.spinner_categoria.getSelectedItem().toString());
+        if(getIntent().getBooleanExtra("flag", false)) {
+            denuncia = denunciaDAO.buscarDenunciaPorId(getIntent().getIntExtra("id", -1));
+        }
+
+
+        switch ((int) mViewHolder.spinner_categoria.getSelectedItemId()) {
+            case 0:
+                denuncia.setCategoria(Categoria.VIAS_PUBLICAS);
+                break;
+            case 1:
+                denuncia.setCategoria(Categoria.EQUIPAMENTOS_COMUNICATARIOS);
+                break;
+            case 2:
+                denuncia.setCategoria(Categoria.LIMPEZA_URBANA);
+                break;
+        }
 
         try {
             denuncia.setData(dateFormat.parse(mViewHolder.button_data.getText().toString()));
@@ -346,13 +399,25 @@ public class CadastrarDenunciaActivity extends AppCompatActivity implements Date
         denuncia.setUriMidia(uri.getPath());
         denuncia.setUsuario(mViewHolder.input_usuario.getText().toString());
 
-        denuncia.setLatitude(latitude);
-        denuncia.setLongitude(longitude);
+        if(getIntent().getBooleanExtra("flag", false) == false) {
+            denuncia.setLatitude(latitude);
+            denuncia.setLongitude(longitude);
+        }
 
-        this.denunciaDAO.inserirDenuncia(denuncia);
+        if(getIntent().getBooleanExtra("flag", false) ) {
+            this.denunciaDAO.atualizarDenuncia(denuncia);
+        }else{
+            this.denunciaDAO.inserirDenuncia(denuncia);
+        }
 
-        Toast toast = Toast.makeText(this, "Denuncia cadastrada com sucesso!", Toast.LENGTH_SHORT);
-        toast.show();
+
+        if(getIntent().getBooleanExtra("flag", false)) {
+            Toast toast = Toast.makeText(this, "Denuncia atualizada com sucesso!", Toast.LENGTH_SHORT);
+            toast.show();
+        }else {
+            Toast toast = Toast.makeText(this, "Denuncia cadastrada com sucesso!", Toast.LENGTH_SHORT);
+            toast.show();
+        }
 
         uri = null;
 

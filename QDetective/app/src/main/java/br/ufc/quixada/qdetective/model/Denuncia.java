@@ -15,13 +15,13 @@ public class Denuncia {
     private Double latitude;
     private String uriMidia;
     private String usuario;
-    private String categoria;
+    private Categoria categoria;
 
     public Denuncia(){
 
     }
 
-    public Denuncia(String descricao, Date data, Double longitude, Double latitude, String uriMidia, String usuario, String categoria) {
+    public Denuncia(String descricao, Date data, Double longitude, Double latitude, String uriMidia, String usuario, Categoria categoria) {
         setDescricao(descricao);
         setData(data);
         setLongitude(longitude);
@@ -89,11 +89,11 @@ public class Denuncia {
         this.usuario = usuario;
     }
 
-    public String getCategoria() {
+    public Categoria getCategoria() {
         return categoria;
     }
 
-    public void setCategoria(String categoria) {
+    public void setCategoria(Categoria categoria) {
         this.categoria = categoria;
     }
 }
