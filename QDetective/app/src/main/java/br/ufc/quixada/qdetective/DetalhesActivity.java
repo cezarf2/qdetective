@@ -17,6 +17,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -69,7 +70,7 @@ public class DetalhesActivity extends AppCompatActivity {
 
         denuncia = denunciaDAO.buscarDenunciaPorId(pos);
 
-        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 
 
         mViewHolder.textDetalheDenuncia.setText(denuncia.getCategoria());

@@ -115,7 +115,8 @@
                     android:onClick="capturarImagem"/>
                 <Button
                     android:text="Gravar Vídeo"
-                    android:id="@+id/gravar_video"/>
+                    android:id="@+id/gravar_video"
+                    android:onClick="capturarVideo"/>
             </TableRow>
         </TableLayout>
 

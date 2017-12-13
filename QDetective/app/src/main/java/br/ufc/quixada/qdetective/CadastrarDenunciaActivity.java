@@ -29,9 +29,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.MediaController;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.VideoView;
 
 import org.w3c.dom.Text;
 
@@ -47,6 +49,8 @@ import br.ufc.quixada.qdetective.view.DatePickerFragment;
 public class CadastrarDenunciaActivity extends AppCompatActivity implements DatePickerFragment.NotificarEscutadorDoDialog {
 
     private static final int CAPTURAR_IMAGEM = 1;
+    private static final int CAPTURAR_VIDEO = 3;
+
     private Uri uri;
     private Double latitude;
     private Double longitude;
@@ -73,7 +77,6 @@ public class CadastrarDenunciaActivity extends AppCompatActivity implements Date
 
         mViewHolder.button_data = (Button) findViewById(R.id.btn_data_denuncia);
         mViewHolder.spinner_categoria = (Spinner) findViewById(R.id.categoria);
-//        mViewHolder.imagem = (ImageView) findViewById(R.id.imagem);
         mViewHolder.input_descricao = (EditText) findViewById(R.id.descricao);
         mViewHolder.input_usuario = (EditText) findViewById(R.id.usuario);
         mViewHolder.latitudeText = findViewById(R.id.latitude_denuncia);
@@ -82,7 +85,6 @@ public class CadastrarDenunciaActivity extends AppCompatActivity implements Date
 
         getLocationManager();
         mViewHolder.spinner_categoria.setAdapter(adapterCategoria);
-//        mViewHolder.imagem.setVisibility(View.INVISIBLE);
 
         possuiCartaoSD = Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED);
         dispositivoSuportaCartaoSD = Environment.isExternalStorageRemovable();
@@ -126,11 +128,47 @@ public class CadastrarDenunciaActivity extends AppCompatActivity implements Date
                 }
                 return;
             }
+            case 3: {
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED &&
+                        grantResults[1] == PackageManager.PERMISSION_GRANTED &&
+                        grantResults[2] == PackageManager.PERMISSION_GRANTED) {
+                    iniciarGravacaoDeVideo();
+                } else {
+                    Toast.makeText(this, "Sem permissão para uso de câmera.", Toast.LENGTH_LONG).show();
+                }
+                return;
+            }
         }
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if(requestCode == CAPTURAR_VIDEO) {
+            if (resultCode == RESULT_OK) {
+                String msg = "Vídeo gravado em " + data.getDataString();
+                uri = data.getData();
+                Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
+
+                VideoView videoView = new VideoView(this);
+                videoView.setLayoutParams(new  LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT, 800
+                ));
+
+                videoView.setVideoURI(uri);
+                MediaController mc = new MediaController(this);
+                videoView.setMediaController(mc);
+
+                mViewHolder.containerMidia.removeAllViews();
+                mViewHolder.containerMidia.addView(videoView);
+
+//                videoView.start();
+            } else {
+                Toast.makeText(this, "Video não gravado!", Toast.LENGTH_LONG).show();
+            }
+        }
+
+
         if (requestCode == CAPTURAR_IMAGEM) {
             if (resultCode == RESULT_OK) {
                 try {
@@ -152,9 +190,6 @@ public class CadastrarDenunciaActivity extends AppCompatActivity implements Date
                     mViewHolder.containerMidia.removeAllViews();
                     mViewHolder.containerMidia.addView(imageView);
 
-//                    mViewHolder.imagem.setImageBitmap(resizedBitmap);
-//                    mViewHolder.imagem.setVisibility(View.VISIBLE);
-
                 } catch (Exception e) {
                     Toast.makeText(this, "Imagem não encontrada!", Toast.LENGTH_LONG).show();
                 }
@@ -169,52 +204,32 @@ public class CadastrarDenunciaActivity extends AppCompatActivity implements Date
         datePickerFragment.show(getFragmentManager(), "Selecione a data");
     }
 
-    private void getPermissoes(){
+    private void getPermissoes(boolean flag){
         boolean camera = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED;
         boolean leitura = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
         boolean escrita = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
 
         if(camera && leitura && escrita){
-            iniciarCapturaDeFotos();
+            if(flag) {
+                iniciarCapturaDeFotos();
+            }else {
+                iniciarGravacaoDeVideo();
+            }
         }
         else{
-            ActivityCompat.requestPermissions(this, new String[]{
-                    Manifest.permission.CAMERA,
-                    Manifest.permission.READ_EXTERNAL_STORAGE,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE
-            }, 1);
-        }
-    }
-
-
-    public void capturarImagem(View view) {
-        if (android.os.Build.VERSION.SDK_INT >= 23) {
-            getPermissoes();
-        } else {
-            iniciarCapturaDeFotos();
-        }
-    }
-
-    private void iniciarCapturaDeFotos() {
-        try {
-            setArquivoImagem();
-            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            intent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
-            startActivityForResult(intent, CAPTURAR_IMAGEM);
-        } catch (Exception e) {
-            Toast.makeText(this, "Erro ao iniciar a câmera.", Toast.LENGTH_LONG).show();
-        }
-    }
-
-    private void setArquivoImagem() {
-        String nomeArquivo = System.currentTimeMillis() + ".jpg";
-        File pathDaImagem = getDiretorioDeSalvamento(nomeArquivo);
-
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            String authority = this.getApplicationContext().getPackageName() + ".fileprovider";
-            uri = FileProvider.getUriForFile(this, authority, pathDaImagem);
-        } else {
-            uri = Uri.fromFile(pathDaImagem);
+            if(flag) {
+                ActivityCompat.requestPermissions(this, new String[]{
+                        Manifest.permission.CAMERA,
+                        Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE
+                }, 1);
+            } else {
+                ActivityCompat.requestPermissions(this, new String[]{
+                        Manifest.permission.CAMERA,
+                        Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE
+                }, 3);
+            }
         }
     }
 
@@ -225,9 +240,67 @@ public class CadastrarDenunciaActivity extends AppCompatActivity implements Date
             diretorio = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
         }
 
-        File pathDaImagem = new File(diretorio, nomeArquivo);
-        return pathDaImagem;
+        File pathDaMidia = new File(diretorio, nomeArquivo);
+        return pathDaMidia;
     }
+
+    public void capturarVideo(View v) {
+        getPermissoes(false);
+    }
+
+
+    private void iniciarGravacaoDeVideo() {
+        try {
+            setArquivo(false);
+            Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
+            intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1);
+            intent.putExtra(MediaStore.EXTRA_DURATION_LIMIT, 10);
+            startActivityForResult(intent, CAPTURAR_VIDEO);
+        } catch (Exception e) {
+            Toast.makeText(this, "Erro ao iniciar a câmera.", Toast.LENGTH_LONG).show();
+        }
+    }
+
+
+    public void capturarImagem(View view) {
+        if (android.os.Build.VERSION.SDK_INT >= 23) {
+            getPermissoes(true);
+        } else {
+            iniciarCapturaDeFotos();
+        }
+    }
+
+    private void iniciarCapturaDeFotos() {
+        try {
+            setArquivo(true);
+            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
+            startActivityForResult(intent, CAPTURAR_IMAGEM);
+        } catch (Exception e) {
+            Toast.makeText(this, "Erro ao iniciar a câmera.", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void setArquivo(boolean flag) {
+        String nomeArquivo = "";
+
+        if(flag) {
+            nomeArquivo = System.currentTimeMillis() + ".jpg";
+        }else {
+            nomeArquivo =  System.currentTimeMillis() + ".mp4";
+        }
+
+        File pathDaMidia = getDiretorioDeSalvamento(nomeArquivo);
+
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            String authority = this.getApplicationContext().getPackageName() + ".fileprovider";
+            uri = FileProvider.getUriForFile(this, authority, pathDaMidia);
+        } else {
+            uri = Uri.fromFile(pathDaMidia);
+        }
+    }
+
 
 
     public void cadastrarDenuncia(View view) {
@@ -262,7 +335,6 @@ public class CadastrarDenunciaActivity extends AppCompatActivity implements Date
         private EditText input_descricao;
         private Button button_data;
         private Spinner spinner_categoria;
-        private ImageView imagem;
         private TextView latitudeText;
         private TextView longitudeText;
         private LinearLayout containerMidia;
@@ -308,9 +380,6 @@ public class CadastrarDenunciaActivity extends AppCompatActivity implements Date
 
             mViewHolder.latitudeText.setText(latitudeAtual);
             mViewHolder.longitudeText.setText(longitudeAtual);
-
-            //String url = String.format(urlBase, latitudeAtual, longitudeAtual);
-            //mViewHolder.webView.loadUrl(url);
         }
 
         @Override
