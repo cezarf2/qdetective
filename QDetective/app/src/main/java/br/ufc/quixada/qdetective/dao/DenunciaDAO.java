@@ -161,14 +161,11 @@ public class DenunciaDAO {
 
     public Denuncia buscarDenunciaPorId(Integer id) {
         db = helper.getReadableDatabase();
-        cursor = db.query(DatabaseHelper.Denuncia.TABELA, DatabaseHelper.Denuncia.COLUNAS, null, null, null, null, null);
-
-        if (cursor.moveToNext()) {
-            Denuncia denuncia = criarDenuncia(cursor);
-            cursor.close();
-            return denuncia;
-        }
-        return null;
+        cursor = db.rawQuery("SELECT * FROM denuncia WHERE _id = " + id.toString(), null );
+        cursor.moveToFirst();
+        Denuncia denuncia = criarDenuncia(cursor);
+        cursor.close();
+        return denuncia;
     }
 
     public long atualizarDenuncia(Denuncia denuncia) {

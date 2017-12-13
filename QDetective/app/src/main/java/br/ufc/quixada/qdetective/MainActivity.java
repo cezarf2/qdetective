@@ -62,31 +62,31 @@ public class MainActivity extends AppCompatActivity implements  AdapterView.OnIt
         OptionsDialogFragment fragment = new OptionsDialogFragment();
 
         Bundle bundle = new Bundle();
-        bundle.putInt("pos", i);
+        bundle.putInt("id", ((Denuncia)customDenunciaAdapter.getItem(i)).getId());
         fragment.setArguments(bundle);
 
         fragment.show(this.getFragmentManager(), "Opções");
     }
 
     @Override
-    public void onDialogEditarClik(int posicao) {
+    public void onDialogEditarClik(int id) {
 
     }
 
     @Override
-    public void onDialogDetalhesClick(int posicao) {
+    public void onDialogDetalhesClick(int id) {
         Intent intent = new Intent(this, DetalhesActivity.class);
-        intent.putExtra("pos", posicao);
+        intent.putExtra("id", id);
         startActivity(intent);
     }
 
     @Override
-    public void onDialogRemoverClick(int posicao) {
+    public void onDialogRemoverClick(int id) {
 
         DialogFragment fragment = new ConfirmaDialogFragment();
 
         Bundle bundle = new Bundle();
-        bundle.putInt("pos", posicao);
+        bundle.putInt("id", id);
         fragment.setArguments(bundle);
 
         fragment.show(this.getFragmentManager(), "confirma");
@@ -94,16 +94,15 @@ public class MainActivity extends AppCompatActivity implements  AdapterView.OnIt
     }
 
     @Override
-    public void onDialogSimClick(DialogFragment dialog, int posicao) {
-        Denuncia denuncia = (Denuncia) customDenunciaAdapter.getItem(posicao);
-        if(denunciaDAO.removerDenuncia(denuncia.getId())) {
+    public void onDialogSimClick(DialogFragment dialog, int id) {
+        if(denunciaDAO.removerDenuncia(id)) {
             Toast.makeText(this, "Denúncia removida com sucesso!", Toast.LENGTH_LONG).show();
             this.onResume();
         }
     }
 
     @Override
-    public void onDialogCancelarClick(DialogFragment dialog, int posicao) {
+    public void onDialogCancelarClick(DialogFragment dialog, int id) {
         Toast.makeText(this, "Operação cancelada!", Toast.LENGTH_LONG).show();
     }
 

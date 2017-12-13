@@ -15,8 +15,8 @@ public class ConfirmaDialogFragment extends DialogFragment {
     private DialogConfirmListener listener;
 
     public interface DialogConfirmListener {
-        public void onDialogSimClick(DialogFragment dialog, int posicao);
-        public void onDialogCancelarClick(DialogFragment dialog, int posicao);
+        public void onDialogSimClick(DialogFragment dialog, int id);
+        public void onDialogCancelarClick(DialogFragment dialog, int id);
     }
 
     @Override
@@ -33,16 +33,16 @@ public class ConfirmaDialogFragment extends DialogFragment {
     DialogInterface.OnClickListener confirmaSim = new DialogInterface.OnClickListener() {
         @Override
         public void onClick(DialogInterface dialogInterface, int i) {
-            int pos = ConfirmaDialogFragment.this.getArguments().getInt("pos");
-            listener.onDialogSimClick(ConfirmaDialogFragment.this, pos);
+            int id = ConfirmaDialogFragment.this.getArguments().getInt("id");
+            listener.onDialogSimClick(ConfirmaDialogFragment.this, id);
         }
     };
 
     DialogInterface.OnClickListener confirmaCancelar = new DialogInterface.OnClickListener() {
         @Override
         public void onClick(DialogInterface dialogInterface, int i) {
-            int pos = ConfirmaDialogFragment.this.getArguments().getInt("pos");
-            listener.onDialogCancelarClick(ConfirmaDialogFragment.this, pos);
+            int id = ConfirmaDialogFragment.this.getArguments().getInt("id");
+            listener.onDialogCancelarClick(ConfirmaDialogFragment.this, id);
         }
     };
 

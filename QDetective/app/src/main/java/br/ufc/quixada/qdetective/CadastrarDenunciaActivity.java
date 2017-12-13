@@ -146,9 +146,6 @@ public class CadastrarDenunciaActivity extends AppCompatActivity implements Date
 
         if(requestCode == CAPTURAR_VIDEO) {
             if (resultCode == RESULT_OK) {
-                String msg = "Vídeo gravado em " + data.getDataString();
-                uri = data.getData();
-                Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
 
                 VideoView videoView = new VideoView(this);
                 videoView.setLayoutParams(new  LinearLayout.LayoutParams(
@@ -161,8 +158,6 @@ public class CadastrarDenunciaActivity extends AppCompatActivity implements Date
 
                 mViewHolder.containerMidia.removeAllViews();
                 mViewHolder.containerMidia.addView(videoView);
-
-//                videoView.start();
             } else {
                 Toast.makeText(this, "Video não gravado!", Toast.LENGTH_LONG).show();
             }
@@ -209,29 +204,46 @@ public class CadastrarDenunciaActivity extends AppCompatActivity implements Date
         boolean leitura = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
         boolean escrita = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
 
-        if(camera && leitura && escrita){
-            if(flag) {
+        if(flag) {
+            if (camera && leitura && escrita) {
                 iniciarCapturaDeFotos();
-            }else {
-                iniciarGravacaoDeVideo();
-            }
-        }
-        else{
-            if(flag) {
-                ActivityCompat.requestPermissions(this, new String[]{
-                        Manifest.permission.CAMERA,
-                        Manifest.permission.READ_EXTERNAL_STORAGE,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE
-                }, 1);
             } else {
                 ActivityCompat.requestPermissions(this, new String[]{
                         Manifest.permission.CAMERA,
                         Manifest.permission.READ_EXTERNAL_STORAGE,
                         Manifest.permission.WRITE_EXTERNAL_STORAGE
-                }, 3);
+                }, CAPTURAR_IMAGEM);
+            }
+        }else{
+            if (camera && leitura && escrita) {
+                iniciarGravacaoDeVideo();
+            } else {
+                ActivityCompat.requestPermissions(this, new String[]{
+                        Manifest.permission.CAMERA,
+                        Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE
+                }, CAPTURAR_VIDEO);
             }
         }
     }
+
+//    private void getPermissoesVideo() {
+//        String CAMERA = Manifest.permission.CAMERA;
+//        String WRITE_EXTERNAL_STORAGE = Manifest.permission.WRITE_EXTERNAL_STORAGE;
+//        String READ_EXTERNAL_STORAGE = Manifest.permission.READ_EXTERNAL_STORAGE;
+//        int PERMISSION_GRANTED = PackageManager.PERMISSION_GRANTED;
+//
+//        boolean permissaoCamera = ActivityCompat.checkSelfPermission(this, CAMERA) == PERMISSION_GRANTED;
+//        boolean permissaoEscrita = ActivityCompat.checkSelfPermission(this, WRITE_EXTERNAL_STORAGE) == PERMISSION_GRANTED;
+//        boolean permissaoLeitura = ActivityCompat.checkSelfPermission(this, READ_EXTERNAL_STORAGE) == PERMISSION_GRANTED;
+//
+//        if (permissaoCamera && permissaoEscrita && permissaoLeitura) {
+//            iniciarGravacaoDeVideo();
+//        } else {
+//            ActivityCompat.requestPermissions(this, new String[]{CAMERA, WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE}, 1);
+//        }
+//    }
+
 
     private File getDiretorioDeSalvamento(String nomeArquivo) {
         File diretorio = this.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
@@ -248,6 +260,22 @@ public class CadastrarDenunciaActivity extends AppCompatActivity implements Date
         getPermissoes(false);
     }
 
+//    private void setArquivoVideo() {
+//        File diretorio = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+//
+//        if (!possuiCartaoSD) {
+//            diretorio = this.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+//        }
+//
+//        File pathVideo = new File(diretorio + "/" + System.currentTimeMillis() + ".mp4");
+//
+//        if (android.os.Build.VERSION.SDK_INT >= 23) {
+//            String authority = this.getApplicationContext().getPackageName() + ".fileprovider";
+//            uri = FileProvider.getUriForFile(this, authority, pathVideo);
+//        } else {
+//            uri = Uri.fromFile(pathVideo);
+//        }
+//    }
 
     private void iniciarGravacaoDeVideo() {
         try {
@@ -284,13 +312,12 @@ public class CadastrarDenunciaActivity extends AppCompatActivity implements Date
 
     private void setArquivo(boolean flag) {
         String nomeArquivo = "";
-
         if(flag) {
             nomeArquivo = System.currentTimeMillis() + ".jpg";
-        }else {
-            nomeArquivo =  System.currentTimeMillis() + ".mp4";
         }
-
+        else {
+            nomeArquivo = System.currentTimeMillis() + ".mp4";
+        }
         File pathDaMidia = getDiretorioDeSalvamento(nomeArquivo);
 
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -326,6 +353,8 @@ public class CadastrarDenunciaActivity extends AppCompatActivity implements Date
 
         Toast toast = Toast.makeText(this, "Denuncia cadastrada com sucesso!", Toast.LENGTH_SHORT);
         toast.show();
+
+        uri = null;
 
         finish();
     }

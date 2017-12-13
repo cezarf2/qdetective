@@ -17,15 +17,16 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.MediaController;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.VideoView;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -56,8 +57,7 @@ public class DetalhesActivity extends AppCompatActivity {
         possuiCartaoSD = Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED);
         dispositivoSuportaCartaoSD = Environment.isExternalStorageRemovable();
 
-        int pos = getIntent().getIntExtra("pos", 0);
-
+        Integer id = getIntent().getIntExtra("id", 0);
         mViewHolder = new ViewHolder();
         denunciaDAO = new DenunciaDAO(this);
 
@@ -68,9 +68,9 @@ public class DetalhesActivity extends AppCompatActivity {
         mViewHolder.detalheContainerMidia = (LinearLayout) findViewById(R.id.detalhe_container_midia);
         mViewHolder.webView = (WebView) findViewById(R.id.mapa);
 
-        denuncia = denunciaDAO.buscarDenunciaPorId(pos);
+        denuncia = denunciaDAO.buscarDenunciaPorId(id);
 
-        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
 
         mViewHolder.textDetalheDenuncia.setText(denuncia.getCategoria());
@@ -80,7 +80,7 @@ public class DetalhesActivity extends AppCompatActivity {
 
         String[] path = denuncia.getUriMidia().split("/");
 
-        File pathDaImagem = getDiretorioDeSalvamento(path[path.length-1]);
+        File pathDaMidia = getDiretorioDeSalvamento(path[path.length-1]);
 
         Uri uri = null;
 
@@ -88,31 +88,45 @@ public class DetalhesActivity extends AppCompatActivity {
 
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             String authority = this.getApplicationContext().getPackageName() + ".fileprovider";
-            uri = FileProvider.getUriForFile(this, authority, pathDaImagem);
+            uri = FileProvider.getUriForFile(this, authority, pathDaMidia);
         } else {
-            uri = Uri.fromFile(pathDaImagem);
+            uri = Uri.fromFile(pathDaMidia);
         }
 
-        try {
-            bitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(uri));
-            int bmpWidth = bitmap.getWidth();
-            int bmpHeight = bitmap.getHeight();
-            Matrix matrix = new Matrix();
-            matrix.postRotate(90);
-            Bitmap resizedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bmpWidth, bmpHeight, matrix, true);
+        System.out.println("*********************************************" + id + "*********************************************");
 
-            ImageView imageView = new ImageView(this);
+        if(path[path.length-1].contains(".jpg")) {
 
-            imageView.setLayoutParams(new  LinearLayout.LayoutParams(
+//                bitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(uri));
+//                int bmpWidth = bitmap.getWidth();
+//                int bmpHeight = bitmap.getHeight();
+//
+//                Bitmap resizedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bmpWidth, bmpHeight, null, true);
+                ImageView imageView = new ImageView(this);
+
+                imageView.setLayoutParams(new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT, 800
+                ));
+
+                imageView.setImageURI(uri);
+
+//                imageView.setImageBitmap(resizedBitmap);
+
+                mViewHolder.detalheContainerMidia.removeAllViews();
+                mViewHolder.detalheContainerMidia.addView(imageView);
+
+
+        }else {
+            VideoView videoView = new VideoView(this);
+            videoView.setLayoutParams(new  LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT, 800
             ));
-
-            imageView.setImageBitmap(resizedBitmap);
+            videoView.setVideoPath(denuncia.getUriMidia());
+            MediaController mc = new MediaController(this);
+            videoView.setMediaController(mc);
 
             mViewHolder.detalheContainerMidia.removeAllViews();
-            mViewHolder.detalheContainerMidia.addView(imageView);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            mViewHolder.detalheContainerMidia.addView(videoView);
         }
 
         setSettingsWebView(mViewHolder.webView);
@@ -127,8 +141,8 @@ public class DetalhesActivity extends AppCompatActivity {
             diretorio = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
         }
 
-        File pathDaImagem = new File(diretorio, nomeArquivo);
-        return pathDaImagem;
+        File pathDaMidia = new File(diretorio, nomeArquivo);
+        return pathDaMidia;
     }
 
     private static class ViewHolder {

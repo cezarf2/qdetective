@@ -26,25 +26,25 @@ public class OptionsDialogFragment extends DialogFragment {
     }
 
     public interface DialogListener {
-        public void onDialogEditarClik(int posicao);
-        public void onDialogDetalhesClick(int posicao);
-        public void onDialogRemoverClick(int posicao);
+        public void onDialogEditarClik(int id);
+        public void onDialogDetalhesClick(int id);
+        public void onDialogRemoverClick(int id);
     };
 
     DialogInterface.OnClickListener itemClick = new DialogInterface.OnClickListener() {
         @Override
         public void onClick(DialogInterface dialog, int which) {
-            int pos = OptionsDialogFragment.this.getArguments().getInt("pos");
+            int id = OptionsDialogFragment.this.getArguments().getInt("id");
 
             switch (which) {
                 case 0:
-                    listener.onDialogEditarClik(pos);
+                    listener.onDialogEditarClik(id);
                     break;
                 case 1:
-                    listener.onDialogDetalhesClick(pos);
+                    listener.onDialogDetalhesClick(id);
                     break;
                 case 2:
-                    listener.onDialogRemoverClick(pos);
+                    listener.onDialogRemoverClick(id);
                     break;
             }
         }
